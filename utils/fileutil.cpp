@@ -80,7 +80,10 @@ bool copyFile2(QString old_path, QString new_path)
 bool deleteFile(QString path)
 {
     if (!isFileExist(path)) return true;
-    return QFile::remove(path);
+    if (QFileInfo(path).isFile())
+        return QFile::remove(path);
+    else
+        return deleteDir(path);
 }
 
 bool renameFile(QString path, QString new_path)
@@ -116,7 +119,7 @@ bool ensureFileExist(QString path)
 
             QFile file(path);
             if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) // 创建文件
-                QMessageBox::critical(NULL, QObject::tr("创建失败"), QObject::tr("创建文件失败\n路径：%1").arg(path));
+                QMessageBox::critical(nullptr, QObject::tr("创建失败"), QObject::tr("创建文件失败\n路径：%1").arg(path));
             file.close();
             return false;
         }
@@ -126,7 +129,7 @@ bool ensureFileExist(QString path)
     {
         QFile file(path);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) // 创建文件
-            QMessageBox::critical(NULL, QObject::tr("创建失败"), QObject::tr("创建文件失败\n路径：%1").arg(path));
+            QMessageBox::critical(nullptr, QObject::tr("创建失败"), QObject::tr("创建文件失败\n路径：%1").arg(path));
         file.close();
         return false;
     }
@@ -226,4 +229,25 @@ QString getDirByFile(QString file_path)
 void addLinkToDeskTop(const QString& filename,const QString& name)
 {
      QFile::link(filename, QStandardPaths::writableLocation(QStandardPaths::DesktopLocation).append("/").append(name+".lnk"));
+}
+
+bool deleteDir(const QString &path)
+{
+    if (path.isEmpty())
+        return false;
+
+    QDir dir(path);
+    if(!dir.exists())
+        return true;
+
+    dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
+    QFileInfoList fileList = dir.entryInfoList();
+    foreach (QFileInfo fi, fileList)
+    {
+        if (fi.isFile())
+            fi.dir().remove(fi.fileName());
+        else
+            deleteDir(fi.absoluteFilePath());
+    }
+    return dir.rmpath(dir.absolutePath());
 }

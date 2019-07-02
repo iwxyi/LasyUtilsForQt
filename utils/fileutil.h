@@ -35,6 +35,7 @@ bool ensureFileNotExist(QString path);
 bool canBeFileName(QString name);
 QString getPathWithIndex(QString dir, QString name, QString suffix);
 QString getDirByFile(QString file_path);
+bool deleteDir(const QString &path);
 
 void addLinkToDeskTop(const QString& filename,const QString& name); // 生成桌面快捷方式
 
