@@ -8,6 +8,9 @@
 #include <QString>
 #include <QStringList>
 #include <QColor>
+#include <QDebug>
+
+#define XML_SPLIT "5YaZ5L2c5aSp5LiL"
 
 QStringList getStrMids(QString text, QString l, QString r); // 取中间文本数组
 QString getStrMid(QString text, QString l, QString r); // 取中间文本2
@@ -21,6 +24,7 @@ QString getXml(QString str, QString pat);
 QStringList getXmls(QString str, QString pat);
 QString makeXml(QString str, QString pat);
 QString makeXml(int i, QString pat);
+QString makeXml(qint64 i, QString pat);
 
 QString ArabToCN(int num);
 

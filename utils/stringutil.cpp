@@ -3,16 +3,18 @@
 QStringList getStrMids(QString text, QString l, QString r)
 {
     QStringList ans;
-    int posl = 0, posr = -r.length();
+    int posl = 0, posr = 0;
     while (posl != -1 && posr != -1)
     {
-        posl = text.indexOf(l, posr+r.length());
+        posl = text.indexOf(l, posr);
         if (posl == -1) return ans;
         posl += l.length();
         posr = text.indexOf(r, posl);
         if (posr == -1) return ans;
         ans << text.mid(posl, posr-posl);
+        posr += r.length();
     }
+
     return ans;
 }
 
@@ -54,20 +56,40 @@ QString getXml(QString str, QString pat)
     pos1 += pat.length()+2;
     int pos2 = str.indexOf(QString("</%1>").arg(pat));
     if (pos2 == -1) pos2 = str.length();
-    return str.mid(pos1, pos2-pos1);
+    return str.mid(pos1, pos2-pos1).replace(XML_SPLIT, "</"+pat+">");
 }
 
 QStringList getXmls(QString str, QString pat)
 {
-    return getStrMids(str, "<"+pat+">", "</"+pat+">");
+//    return getStrMids(str, "<"+pat+">", "</"+pat+">");
+    QStringList ans;
+    QString l = "<"+pat+">", r = "</"+pat+">";
+    int posl = 0, posr = 0;
+    while (posl != -1 && posr != -1)
+    {
+        posl = str.indexOf(l, posr);
+        if (posl == -1) return ans;
+        posl += l.length();
+        posr = str.indexOf(r, posl);
+        if (posr == -1) return ans;
+        ans << str.mid(posl, posr-posl).replace(XML_SPLIT, r);
+        posr += r.length();
+    }
+    return ans;
 }
 
 QString makeXml(QString str, QString pat)
 {
+    str = str.replace("</"+pat+">", XML_SPLIT);
     return QString("<%1>%2</%3>").arg(pat).arg(str).arg(pat);
 }
 
 QString makeXml(int i, QString pat)
+{
+    return QString("<%1>%2</%3>").arg(pat).arg(i).arg(pat);
+}
+
+QString makeXml(qint64 i/*专门针对时间戳*/, QString pat)
 {
     return QString("<%1>%2</%3>").arg(pat).arg(i).arg(pat);
 }
